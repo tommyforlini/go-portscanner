@@ -36,7 +36,7 @@ func scanASync(hostname string) []model.State {
 }
 
 func scanSync(hostname string) []model.State {
-	defer utils.Track(utils.Runningtime("execute scanASync"))
+	defer utils.Track(utils.Runningtime("execute scanSync"))
 
 	var results []model.State
 
