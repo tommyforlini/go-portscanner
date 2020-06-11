@@ -36,7 +36,7 @@ func ScanPortAsync(protocol, hostname string, port int) *model.State {
 // error implies that is closed and unused
 func scan(protocol, hostname string, port int) error {
 	address := hostname + ":" + strconv.Itoa(port)
-	conn, err := net.DialTimeout(protocol, address, 500*time.Microsecond)
+	conn, err := net.DialTimeout(protocol, address, 100*time.Millisecond)
 
 	if err != nil {
 		return err
