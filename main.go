@@ -12,12 +12,21 @@ import (
 // PORTS max ports to scan
 const PORTS = 1024
 
+// PROTOCOL what type to scan
+const PROTOCOL = "tcp"
+
+// HOST what to scan
+const HOST = "localhost"
+
 func main() {
 
-	scanSync("localhost")
+	log.Printf("Scanning Host: %s | Protocol: %s\n\n\n", HOST, PROTOCOL)
 
-	scanASync("localhost")
+	scanSync(HOST)
 
+	scanASync(HOST)
+
+	scanASyncNoChannel(HOST)
 }
 
 func scanASync(hostname string) {
@@ -33,7 +42,7 @@ func scanASync(hostname string) {
 			wg.Add(1)
 			go func(port int) {
 				defer wg.Done()
-				ch <- scanner.ScanPortAsync("tcp", hostname, port)
+				ch <- scanner.ScanPortAsync(PROTOCOL, hostname, port)
 			}(i)
 		}
 		wg.Wait()
@@ -50,13 +59,37 @@ func scanASync(hostname string) {
 	log.Printf("async results %v\n", results)
 }
 
+func scanASyncNoChannel(hostname string) {
+	defer utils.Track(utils.Runningtime("execute scanASyncNoChannel"))
+
+	var results []*model.State
+
+	var wg sync.WaitGroup
+
+	for i := 1; i <= PORTS; i++ {
+		wg.Add(1)
+		go func(port int) {
+			defer wg.Done()
+			result := scanner.ScanPortAsync(PROTOCOL, hostname, port)
+			if result.Opened {
+				results = append(results, result)
+			}
+
+		}(i)
+	}
+	wg.Wait()
+
+	log.Printf("scanASyncNoChannel slice size %v", len(results))
+	log.Printf("scanASyncNoChannel results %v\n", results)
+}
+
 func scanSync(hostname string) {
 	defer utils.Track(utils.Runningtime("execute scanSync"))
 
 	var results []model.State
 
 	for i := 1; i <= PORTS; i++ {
-		result := scanner.ScanPortSync("tcp", hostname, i)
+		result := scanner.ScanPortSync(PROTOCOL, hostname, i)
 		if result.Opened {
 			results = append(results, result)
 		}

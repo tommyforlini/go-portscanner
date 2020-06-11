@@ -13,4 +13,5 @@ func Runningtime(s string) (string, time.Time) {
 func Track(s string, startTime time.Time) {
 	endTime := time.Now()
 	log.Println("End:	", s, "took", endTime.Sub(startTime))
+	log.Print("=======\n\n")
 }
